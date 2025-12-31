@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel - Satta King Fast</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { background: #f0f2f5; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .admin-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 300px; }
+        h2 { color: #d32f2f; margin-bottom: 25px; }
+        input { width: 100%; padding: 15px; font-size: 28px; text-align: center; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; }
+        button { background: #d32f2f; color: white; border: none; padding: 15px; width: 100%; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #b71c1c; }
+        #status { margin-top: 15px; font-weight: bold; color: green; }
+    </style>
+</head>
+<body>
+
+<div class="admin-card">
+    <h2>Admin Panel</h2>
+    <p>Set Aligarh Number</p>
+    <input type="number" id="numVal" placeholder="00">
+    <button onclick="sendUpdate()">UPDATE LIVE SITE</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAbiXDsOnDB5Wz4Q1BZ-0_V9h2rVJTtbFk",
+        authDomain: "kingf-2c7c5.firebaseapp.com",
+        databaseURL: "https://kingf-2c7c5-default-rtdb.firebaseio.com",
+        projectId: "kingf-2c7c5",
+        storageBucket: "kingf-2c7c5.firebasestorage.app",
+        messagingSenderId: "932519197016",
+        appId: "1:932519197016:web:bd59079bc5b6034c024d2d",
+        measurementId: "G-Y750J8GGTZ"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    function sendUpdate() {
+        const n = document.getElementById('numVal').value;
+        if(!n) return alert("Please enter a number!");
+
+        firebase.database().ref('live_results/aligarh').set({
+            number: n,
+            updatedAt: Date.now()
+        }).then(() => {
+            document.getElementById('status').innerText = "Successfully Updated to " + n;
+            document.getElementById('numVal').value = "";
+        }).catch(err => alert("Error: " + err.message));
+    }
+</script>
+
+</body>
+</html>
