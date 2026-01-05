@@ -24,7 +24,7 @@
 
 <div class="admin-card">
     <h2>Admin Panel</h2>
-    <p class="sub-text">SHREE GANESH LIVE UPDATE</p>
+    <p class="sub-text">SHIV SHANKAR LIVE UPDATE</p>
     
     <input type="number" id="numVal" placeholder="00" autofocus>
     
@@ -34,7 +34,6 @@
 </div>
 
 <script>
-    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAbiXDsOnDB5Wz4Q1BZ-0_V9h2rVJTtbFk",
         authDomain: "kingf-2c7c5.firebaseapp.com",
@@ -46,7 +45,6 @@
         measurementId: "G-Y750J8GGTZ"
     };
     
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
@@ -55,33 +53,27 @@
         const statusDiv = document.getElementById('status');
         const btn = document.getElementById('updateBtn');
 
-        // Basic Validation
         if(!n || n.length > 2) {
             statusDiv.className = "error";
             statusDiv.innerText = "Please enter a 1 or 2 digit number!";
             return;
         }
 
-        // Disable button during update
         btn.disabled = true;
         btn.innerText = "Updating...";
 
-        // Update Database at 'live_results/shree_ganesh'
-        database.ref('live_results/shree_ganesh').set({
+        // Path changed to 'shiv_shankar'
+        database.ref('live_results/shiv_shankar').set({
             number: n,
             updatedAt: Date.now()
         }).then(() => {
-            // Success Handling
             statusDiv.className = "success";
-            statusDiv.innerText = "Successfully updated to: " + n;
+            statusDiv.innerText = "Successfully updated Shiv Shankar to: " + n;
             document.getElementById('numVal').value = ""; 
-            
             btn.disabled = false;
             btn.innerText = "UPDATE LIVE SITE";
             document.getElementById('numVal').focus();
-
         }).catch(err => {
-            // Error Handling
             statusDiv.className = "error";
             statusDiv.innerText = "Error: " + err.message;
             btn.disabled = false;
@@ -89,13 +81,9 @@
         });
     }
 
-    // Listener for 'Enter' key press
     document.getElementById("numVal").addEventListener("keyup", function(event) {
-        if (event.key === "Enter") {
-            sendUpdate();
-        }
+        if (event.key === "Enter") { sendUpdate(); }
     });
 </script>
-
 </body>
 </html>
