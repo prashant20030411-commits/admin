@@ -41,7 +41,7 @@
         const n = document.getElementById('numVal').value;
         if(!n) return alert("Please enter a number!");
 
-        firebase.database().ref('live_results/aligarh').set({
+        firebase.database().ref('live_results/shree_ganesh'').set({
             number: n,
             updatedAt: Date.now()
         }).then(() => {
