@@ -1,54 +1,40 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Satta King Fast | Live Result Chart 2026</title>
+    <title>Admin Panel - Satta King Fast</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #fff; margin: 0; padding: 0; }
-        .top-header { background: #d32f2f; color: yellow; text-align: center; padding: 15px 0; border-bottom: 5px solid #000; }
-        .top-header h1 { margin: 0; font-size: 32px; font-weight: 900; text-transform: uppercase; }
-        .marquee-box { background: #4caf50; color: white; padding: 8px 0; font-weight: bold; border-bottom: 2px solid #000; }
-        .main-container { max-width: 900px; margin: 20px auto; padding: 0 10px; }
-        .live-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 2px solid #333; }
-        .live-table th { background: #333; color: #fff; padding: 12px; }
-        .live-table td { border: 1px solid #ccc; padding: 15px; text-align: center; font-size: 22px; font-weight: bold; }
-        .loc-name { text-align: left; padding-left: 20px !important; color: #d32f2f; }
-        .live-highlight { background: #fff9c4; border: 2px solid #d32f2f !important; }
-        .live-dot { height: 12px; width: 12px; background-color: #f44336; border-radius: 50%; display: inline-block; margin-right: 8px; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .admin-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        h2 { color: #d32f2f; margin-bottom: 5px; text-transform: uppercase; }
+        p.sub-text { color: #666; margin-bottom: 25px; font-weight: bold; font-size: 14px; }
+        input { width: 100%; padding: 15px; font-size: 32px; text-align: center; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #d32f2f; box-shadow: 0 0 8px rgba(211, 47, 47, 0.2); }
+        button { background: #d32f2f; color: white; border: none; padding: 15px; width: 100%; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #b71c1c; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        #status { margin-top: 15px; font-weight: bold; min-height: 20px; font-size: 14px; }
+        .success { color: #2e7d32; }
+        .error { color: #d32f2f; }
     </style>
 </head>
 <body>
 
-<div class="top-header">
-    <h1>SATTA KING FAST</h1>
-</div>
-
-<div class="marquee-box">
-    <marquee>Satta King Live Result: Delhi Bazar, Shree Ganesh, Faridabad, Ghaziabad, Gali, Disawar Update Instantly!</marquee>
-</div>
-
-<div class="main-container">
-    <table class="live-table">
-        <thead>
-            <tr>
-                <th>Location (Ghar)</th>
-                <th>Today's Result</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="live-highlight">
-                <td class="loc-name"><span class="live-dot"></span>SHREE GANESH (LIVE)</td>
-                <td id="shree-ganesh-live" style="color:red; font-size: 35px;">--</td>
-            </tr>
-            </tbody>
-    </table>
+<div class="admin-card">
+    <h2>Admin Panel</h2>
+    <p class="sub-text">SHREE GANESH LIVE UPDATE</p>
+    
+    <input type="number" id="numVal" placeholder="00" autofocus>
+    
+    <button id="updateBtn" onclick="sendUpdate()">UPDATE LIVE SITE</button>
+    
+    <div id="status"></div>
 </div>
 
 <script>
+    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAbiXDsOnDB5Wz4Q1BZ-0_V9h2rVJTtbFk",
         authDomain: "kingf-2c7c5.firebaseapp.com",
@@ -59,14 +45,54 @@
         appId: "1:932519197016:web:bd59079bc5b6034c024d2d",
         measurementId: "G-Y750J8GGTZ"
     };
+    
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-    // Listener for Shree Ganesh
-    const dbRef = firebase.database().ref('live_results/shree_ganesh');
-    dbRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data && data.number) {
-            document.getElementById('shree-ganesh-live').innerText = data.number;
+    function sendUpdate() {
+        const n = document.getElementById('numVal').value;
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('updateBtn');
+
+        // Basic Validation
+        if(!n || n.length > 2) {
+            statusDiv.className = "error";
+            statusDiv.innerText = "Please enter a 1 or 2 digit number!";
+            return;
+        }
+
+        // Disable button during update
+        btn.disabled = true;
+        btn.innerText = "Updating...";
+
+        // Update Database at 'live_results/shree_ganesh'
+        database.ref('live_results/shree_ganesh').set({
+            number: n,
+            updatedAt: Date.now()
+        }).then(() => {
+            // Success Handling
+            statusDiv.className = "success";
+            statusDiv.innerText = "Successfully updated to: " + n;
+            document.getElementById('numVal').value = ""; 
+            
+            btn.disabled = false;
+            btn.innerText = "UPDATE LIVE SITE";
+            document.getElementById('numVal').focus();
+
+        }).catch(err => {
+            // Error Handling
+            statusDiv.className = "error";
+            statusDiv.innerText = "Error: " + err.message;
+            btn.disabled = false;
+            btn.innerText = "UPDATE LIVE SITE";
+        });
+    }
+
+    // Listener for 'Enter' key press
+    document.getElementById("numVal").addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            sendUpdate();
         }
     });
 </script>
