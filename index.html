@@ -11,21 +11,23 @@
         .header { text-align: center; color: #d32f2f; margin-bottom: 30px; }
         .header h1 { margin: 0; text-transform: uppercase; }
         
-        /* Market Card Grid */
         .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
-        .market-card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .market-card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .market-title { color: #333; font-weight: bold; border-bottom: 2px solid #f0f2f5; margin-bottom: 15px; padding-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; }
         .market-title span { background: #d32f2f; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px; }
 
         .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .field { flex: 1; }
         label { display: block; font-size: 11px; color: #888; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 12px; font-size: 20px; text-align: center; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: #d32f2f; }
+        input { width: 100%; padding: 12px; font-size: 20px; text-align: center; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #d32f2f; box-shadow: 0 0 5px rgba(211,47,47,0.1); }
 
-        button { background: #d32f2f; color: white; border: none; padding: 12px; width: 100%; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        button:hover { background: #b71c1c; }
+        button { background: #d32f2f; color: white; border: none; padding: 12px; width: 100%; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
+        button:hover { background: #b71c1c; transform: translateY(-1px); }
         button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        /* Updated Success State */
+        button.updated-success { background: #2e7d32 !important; color: #fff !important; }
         
         .status-msg { margin-top: 10px; font-size: 12px; font-weight: bold; text-align: center; height: 15px; }
         .success { color: #2e7d32; }
@@ -37,121 +39,43 @@
 <div class="master-container">
     <div class="header">
         <h1>Satta King Master Panel</h1>
-        <p style="color: #666; font-weight: bold;">Update Live Results & Yesterday's Data</p>
+        <p style="color: #666; font-weight: bold;">LIVE CLOUD UPDATE CONTROL</p>
     </div>
 
     <div class="admin-grid">
-        <div class="market-card">
-            <div class="market-title"><span>LIVE</span> Shiv Shankar</div>
-            <div class="input-group">
-                <div class="field">
-                    <label>YESTERDAY</label>
-                    <input type="number" id="ss_yes" placeholder="00">
-                </div>
-                <div class="field">
-                    <label>TODAY</label>
-                    <input type="number" id="ss_today" placeholder="00">
-                </div>
-            </div>
-            <button onclick="updateMarket('shiv_shankar', 'ss_today', 'ss_yes')">UPDATE SHIV SHANKAR</button>
-            <div id="ss_status" class="status-msg"></div>
-        </div>
+        <script>
+            const markets = [
+                { id: 'ss', name: 'Shiv Shankar', path: 'shiv_shankar', live: true },
+                { id: 'db', name: 'Delhi Bazar', path: 'delhi_bazar', live: false },
+                { id: 'sg', name: 'Shree Ganesh', path: 'shree_ganesh', live: false },
+                { id: 'fb', name: 'Faridabad', path: 'faridabad', live: false },
+                { id: 'gz', name: 'Ghaziabad', path: 'ghaziabad', live: false },
+                { id: 'gl', name: 'Gali', path: 'gali', live: false },
+                { id: 'ds', name: 'Disawar', path: 'disawar', live: false }
+            ];
 
-        <div class="market-card">
-            <div class="market-title">Delhi Bazar</div>
-            <div class="input-group">
-                <div class="field">
-                    <label>YESTERDAY</label>
-                    <input type="number" id="db_yes" placeholder="00">
+            markets.forEach(m => {
+                document.write(`
+                <div class="market-card">
+                    <div class="market-title">${m.live ? '<span>LIVE</span>' : ''}${m.name}</div>
+                    <div class="input-group">
+                        <div class="field">
+                            <label>YESTERDAY</label>
+                            <input type="number" id="${m.id}_yes" placeholder="00">
+                        </div>
+                        <div class="field">
+                            <label>TODAY</label>
+                            <input type="number" id="${m.id}_today" placeholder="00">
+                        </div>
+                    </div>
+                    <button id="btn_${m.id}" onclick="updateMarket('${m.path}', '${m.id}_today', '${m.id}_yes', 'btn_${m.id}')">
+                        UPDATE ${m.name.toUpperCase()}
+                    </button>
+                    <div id="${m.path}_status" class="status-msg"></div>
                 </div>
-                <div class="field">
-                    <label>TODAY</label>
-                    <input type="number" id="db_today" placeholder="00">
-                </div>
-            </div>
-            <button onclick="updateMarket('delhi_bazar', 'db_today', 'db_yes')">UPDATE DELHI BAZAR</button>
-            <div id="db_status" class="status-msg"></div>
-        </div>
-
-        <div class="market-card">
-            <div class="market-title">Shree Ganesh</div>
-            <div class="input-group">
-                <div class="field">
-                    <label>YESTERDAY</label>
-                    <input type="number" id="sg_yes" placeholder="00">
-                </div>
-                <div class="field">
-                    <label>TODAY</label>
-                    <input type="number" id="sg_today" placeholder="00">
-                </div>
-            </div>
-            <button onclick="updateMarket('shree_ganesh', 'sg_today', 'sg_yes')">UPDATE SHREE GANESH</button>
-            <div id="sg_status" class="status-msg"></div>
-        </div>
-
-        <div class="market-card">
-            <div class="market-title">Faridabad</div>
-            <div class="input-group">
-                <div class="field">
-                    <label>YESTERDAY</label>
-                    <input type="number" id="fb_yes" placeholder="00">
-                </div>
-                <div class="field">
-                    <label>TODAY</label>
-                    <input type="number" id="fb_today" placeholder="00">
-                </div>
-            </div>
-            <button onclick="updateMarket('faridabad', 'fb_today', 'fb_yes')">UPDATE FARIDABAD</button>
-            <div id="fb_status" class="status-msg"></div>
-        </div>
-
-        <div class="market-card">
-            <div class="market-title">Ghaziabad</div>
-            <div class="input-group">
-                <div class="field">
-                    <label>YESTERDAY</label>
-                    <input type="number" id="gz_yes" placeholder="00">
-                </div>
-                <div class="field">
-                    <label>TODAY</label>
-                    <input type="number" id="gz_today" placeholder="00">
-                </div>
-            </div>
-            <button onclick="updateMarket('ghaziabad', 'gz_today', 'gz_yes')">UPDATE GHAZIABAD</button>
-            <div id="gz_status" class="status-msg"></div>
-        </div>
-
-        <div class="market-card">
-            <div class="market-title">Gali</div>
-            <div class="input-group">
-                <div class="field">
-                    <label>YESTERDAY</label>
-                    <input type="number" id="gl_yes" placeholder="00">
-                </div>
-                <div class="field">
-                    <label>TODAY</label>
-                    <input type="number" id="gl_today" placeholder="00">
-                </div>
-            </div>
-            <button onclick="updateMarket('gali', 'gl_today', 'gl_yes')">UPDATE GALI</button>
-            <div id="gl_status" class="status-msg"></div>
-        </div>
-
-        <div class="market-card">
-            <div class="market-title">Disawar</div>
-            <div class="input-group">
-                <div class="field">
-                    <label>YESTERDAY</label>
-                    <input type="number" id="ds_yes" placeholder="00">
-                </div>
-                <div class="field">
-                    <label>TODAY</label>
-                    <input type="number" id="ds_today" placeholder="00">
-                </div>
-            </div>
-            <button onclick="updateMarket('disawar', 'ds_today', 'ds_yes')">UPDATE DISAWAR</button>
-            <div id="ds_status" class="status-msg"></div>
-        </div>
+                `);
+            });
+        </script>
     </div>
 </div>
 
@@ -163,34 +87,47 @@
         projectId: "kingf-2c7c5",
         storageBucket: "kingf-2c7c5.firebasestorage.app",
         messagingSenderId: "932519197016",
-        appId: "1:932519197016:web:bd59079bc5b6034c024d2d",
-        measurementId: "G-Y750J8GGTZ"
+        appId: "1:932519197016:web:bd59079bc5b6034c024d2d"
     };
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    function updateMarket(dbPath, todayId, yesterdayId) {
+    function updateMarket(dbPath, todayId, yesterdayId, btnId) {
         const todayNum = document.getElementById(todayId).value;
         const yesNum = document.getElementById(yesterdayId).value;
-        const statusDiv = document.getElementById(dbPath + '_status');
+        const btn = document.getElementById(btnId);
+        const originalText = btn.innerText;
 
         if(!todayNum || todayNum.length > 2) {
-            alert("Please enter a valid result!");
+            alert("Please enter a valid 1 or 2 digit result!");
             return;
         }
 
-        // Updates both values at once to keep your site perfectly synced
+        btn.disabled = true;
+        btn.innerText = "UPDATING...";
+
+        // Send to Firebase
         database.ref('live_results/' + dbPath).set({
             number: todayNum,
             yesterday: yesNum || "00",
             updatedAt: Date.now()
         }).then(() => {
-            statusDiv.className = "status-msg success";
-            statusDiv.innerText = "Updated Successfully!";
-            setTimeout(() => { statusDiv.innerText = ""; }, 3000);
+            // SUCCESS STATE
+            btn.classList.add('updated-success');
+            btn.innerText = "✔ UPDATED";
+            
+            // RESET AFTER 3 SECONDS
+            setTimeout(() => {
+                btn.classList.remove('updated-success');
+                btn.innerText = originalText;
+                btn.disabled = false;
+                document.getElementById(todayId).value = ""; // Clear only today field
+            }, 3000);
+
         }).catch(err => {
-            statusDiv.className = "status-msg error";
-            statusDiv.innerText = "Error: " + err.message;
+            alert("Error: " + err.message);
+            btn.disabled = false;
+            btn.innerText = originalText;
         });
     }
 </script>
