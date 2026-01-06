@@ -19,19 +19,22 @@
         .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .field { flex: 1; }
         label { display: block; font-size: 11px; color: #888; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 12px; font-size: 20px; text-align: center; border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        
+        /* Changed to handle text alignment and auto-uppercase */
+        input { 
+            width: 100%; padding: 12px; font-size: 20px; text-align: center; 
+            border: 2px solid #ddd; border-radius: 6px; box-sizing: border-box; 
+            outline: none; transition: 0.3s; text-transform: uppercase; 
+        }
         input:focus { border-color: #d32f2f; box-shadow: 0 0 5px rgba(211,47,47,0.1); }
 
         button { background: #d32f2f; color: white; border: none; padding: 12px; width: 100%; font-size: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
         button:hover { background: #b71c1c; transform: translateY(-1px); }
         button:disabled { background: #ccc; cursor: not-allowed; }
         
-        /* Updated Success State */
         button.updated-success { background: #2e7d32 !important; color: #fff !important; }
         
         .status-msg { margin-top: 10px; font-size: 12px; font-weight: bold; text-align: center; height: 15px; }
-        .success { color: #2e7d32; }
-        .error { color: #d32f2f; }
     </style>
 </head>
 <body>
@@ -46,12 +49,12 @@
         <script>
             const markets = [
                 { id: 'ss', name: 'Shiv Shankar', path: 'shiv_shankar', live: true },
-                { id: 'db', name: 'Delhi Bazar', path: 'delhi_bazar', live: false },
-                { id: 'sg', name: 'Shree Ganesh', path: 'shree_ganesh', live: false },
-                { id: 'fb', name: 'Faridabad', path: 'faridabad', live: false },
-                { id: 'gz', name: 'Ghaziabad', path: 'ghaziabad', live: false },
-                { id: 'gl', name: 'Gali', path: 'gali', live: false },
-                { id: 'ds', name: 'Disawar', path: 'disawar', live: false }
+                { id: 'db', name: 'Delhi Bazar', path: 'delhi_bazar', live: true },
+                { id: 'sg', name: 'Shree Ganesh', path: 'shree_ganesh', live: true },
+                { id: 'fb', name: 'Faridabad', path: 'faridabad', live:true },
+                { id: 'gz', name: 'Ghaziabad', path: 'ghaziabad', live: true },
+                { id: 'gl', name: 'Gali', path: 'gali', live: true },
+                { id: 'ds', name: 'Disawar', path: 'disawar', live: true }
             ];
 
             markets.forEach(m => {
@@ -61,11 +64,11 @@
                     <div class="input-group">
                         <div class="field">
                             <label>YESTERDAY</label>
-                            <input type="number" id="${m.id}_yes" placeholder="00">
+                            <input type="text" id="${m.id}_yes" placeholder="00" maxlength="2">
                         </div>
                         <div class="field">
                             <label>TODAY</label>
-                            <input type="number" id="${m.id}_today" placeholder="00">
+                            <input type="text" id="${m.id}_today" placeholder="00" maxlength="2">
                         </div>
                     </div>
                     <button id="btn_${m.id}" onclick="updateMarket('${m.path}', '${m.id}_today', '${m.id}_yes', 'btn_${m.id}')">
@@ -93,35 +96,34 @@
     const database = firebase.database();
 
     function updateMarket(dbPath, todayId, yesterdayId, btnId) {
-        const todayNum = document.getElementById(todayId).value;
-        const yesNum = document.getElementById(yesterdayId).value;
+        // Use .toUpperCase() so 'xx' becomes 'XX' automatically
+        const todayVal = document.getElementById(todayId).value.toUpperCase();
+        const yesVal = document.getElementById(yesterdayId).value.toUpperCase();
         const btn = document.getElementById(btnId);
         const originalText = btn.innerText;
 
-        if(!todayNum || todayNum.length > 2) {
-            alert("Please enter a valid 1 or 2 digit result!");
+        // Validation updated to allow alphanumeric but check length
+        if(!todayVal) {
+            alert("Please enter a result (e.g. 05 or XX)");
             return;
         }
 
         btn.disabled = true;
         btn.innerText = "UPDATING...";
 
-        // Send to Firebase
         database.ref('live_results/' + dbPath).set({
-            number: todayNum,
-            yesterday: yesNum || "00",
+            number: todayVal,
+            yesterday: yesVal || "00",
             updatedAt: Date.now()
         }).then(() => {
-            // SUCCESS STATE
             btn.classList.add('updated-success');
             btn.innerText = "✔ UPDATED";
             
-            // RESET AFTER 3 SECONDS
             setTimeout(() => {
                 btn.classList.remove('updated-success');
                 btn.innerText = originalText;
                 btn.disabled = false;
-                document.getElementById(todayId).value = ""; // Clear only today field
+                document.getElementById(todayId).value = ""; 
             }, 3000);
 
         }).catch(err => {
