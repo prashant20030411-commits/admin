@@ -96,13 +96,14 @@
     const database = firebase.database();
 
     function updateMarket(dbPath, todayId, yesterdayId, btnId) {
-        // Use .toUpperCase() so 'xx' becomes 'XX' automatically
         const todayVal = document.getElementById(todayId).value.toUpperCase();
         const yesVal = document.getElementById(yesterdayId).value.toUpperCase();
         const btn = document.getElementById(btnId);
         const originalText = btn.innerText;
 
-        // Validation updated to allow alphanumeric but check length
+        // Extract the market short-code (e.g., 'fb' from 'btn_fb')
+        const marketKey = btnId.replace('btn_', ''); 
+
         if(!todayVal) {
             alert("Please enter a result (e.g. 05 or XX)");
             return;
@@ -111,11 +112,29 @@
         btn.disabled = true;
         btn.innerText = "UPDATING...";
 
-        database.ref('live_results/' + dbPath).set({
+        // 1. Get Current Date Info for History Path
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        
+        const historyPath = `history/${year}_${month}/${day}/${marketKey}`;
+
+        // 2. Prepare Updates for both Live and History nodes
+        const updates = {};
+        
+        // Update Live Node (Top Table)
+        updates['live_results/' + dbPath] = {
             number: todayVal,
             yesterday: yesVal || "00",
-            updatedAt: Date.now()
-        }).then(() => {
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        // Update History Node (Charts)
+        updates[historyPath] = todayVal;
+
+        // 3. Push to Firebase
+        database.ref().update(updates).then(() => {
             btn.classList.add('updated-success');
             btn.innerText = "✔ UPDATED";
             
